@@ -5,6 +5,8 @@ var path = require('path');
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
 
 server.listen(port, () => {
   console.log('Server listening at port %d', port);
@@ -16,6 +18,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Chatroom
 
 var numUsers = 0;
+var number = Math.random();
+
+setInterval(() => {
+  number = Math.random();
+  eventEmitter.emit('5 seconds');
+}, 5000);
 
 io.on('connection', (socket) => {
   var addedUser = false;
@@ -58,6 +66,12 @@ io.on('connection', (socket) => {
   socket.on('stop typing', () => {
     socket.broadcast.emit('stop typing', {
       username: socket.username
+    });
+  });
+
+  eventEmitter.on('5 seconds', () => {
+    socket.emit('5 seconds', {
+      number: number
     });
   });
 

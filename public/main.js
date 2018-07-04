@@ -247,6 +247,11 @@ $(function() {
     addParticipantsMessage(data);
   });
 
+  // Whenever the server emits 'user joined', log it in the chat body
+  socket.on('5 seconds', (data) => {
+    log('Random number: ' + data.number);
+  });
+
   // Whenever the server emits 'user left', log it in the chat body
   socket.on('user left', (data) => {
     log(data.username + ' left');
