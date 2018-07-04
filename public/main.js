@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
   var FADE_TIME = 150; // ms
   var TYPING_TIMER_LENGTH = 400; // ms
   var COLORS = [
@@ -69,7 +69,7 @@ $(function() {
   }
 
   // Log a message
-    const log = (message, options) => {
+  const log = (message, options) => {
     var $el = $('<li>').addClass('log').text(message);
     addMessageElement($el, options);
   }
@@ -85,7 +85,7 @@ $(function() {
     }
 
     var $usernameDiv = $('<span class="username"/>')
-      .text(data.username)
+      .text(data.username + (data.secret ? ' (secret)' : ''))
       .css('color', getUsernameColor(data.username));
     var $messageBodyDiv = $('<span class="messageBody">')
       .text(data.message);
@@ -181,7 +181,7 @@ $(function() {
     // Compute hash code
     var hash = 7;
     for (var i = 0; i < username.length; i++) {
-       hash = username.charCodeAt(i) + (hash << 5) - hash;
+      hash = username.charCodeAt(i) + (hash << 5) - hash;
     }
     // Calculate color
     var index = Math.abs(hash % COLORS.length);
@@ -247,7 +247,21 @@ $(function() {
     addParticipantsMessage(data);
   });
 
-  // Whenever the server emits 'user joined', log it in the chat body
+  // Whenever the server emits 'count', log user count
+  socket.on('count', (data) => {
+    log('User count: ' + data.numUsers);
+  });
+
+  // Whenever the server emits 'count', log user count
+  socket.on('secret', (data) => {
+    if (data.secret) {
+      log(data.username + ' has joined secret channel.');
+    } else {
+      log(data.username + ' has left secret channel.');
+    }
+  });
+
+  // Whenever the server emits '5 seconds', log received random number
   socket.on('5 seconds', (data) => {
     log('Random number: ' + data.number);
   });

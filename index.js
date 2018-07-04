@@ -31,10 +31,34 @@ io.on('connection', (socket) => {
   // when the client emits 'new message', this listens and executes
   socket.on('new message', (data) => {
     // we tell the client to execute 'new message'
-    socket.broadcast.emit('new message', {
-      username: socket.username,
-      message: data
-    });
+    switch (data) {
+      case 'count':
+        socket.emit('count', {
+          numUsers: numUsers
+        });
+        break;
+      case 'secret':
+        socket.join('secret');
+        socket.secret = !socket.secret;
+        io.to('secret').emit('secret', {
+          username: socket.username,
+          secret: socket.secret
+        });
+        break;
+      default:
+        if (socket.secret) {
+          socket.broadcast.to('secret').emit('new message', {
+            username: socket.username,
+            message: data,
+            secret: true
+          });
+        } else {
+          socket.broadcast.emit('new message', {
+            username: socket.username,
+            message: data
+          });
+        }
+    }
   });
 
   // when the client emits 'add user', this listens and executes
